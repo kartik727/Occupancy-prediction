@@ -4,7 +4,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 import sys
-sys.path.insert(0, 'C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Model/custom_functions')
+sys.path.insert(0, 'C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Occupancy-prediction/custom_functions')
 #sys.path.insert(1, 'C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Model/data/sample')
 
 from read_data import headerData, readAttendance
@@ -28,7 +28,7 @@ with open('sample.csv') as csv_file:
 
 
 
-X_train = pd.read_csv('C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Model/data/sample/sample1.csv', header = None)
+X_train = pd.read_csv('C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Occupancy-prediction/data/sample/sample1.csv', header = None)
 
 
 
@@ -44,7 +44,7 @@ notAdded = 0
 
 for s in att_flat:
     
-    isPresent, iT, oT = readAttendance(s, [11, 0])
+    isPresent, pm, iT, oT = readAttendance(s, [11, 0])
     #print(s)
     if(isPresent):
         if ((oT-iT) > 0) and iT < 60:
@@ -73,9 +73,9 @@ print(len(stayTime))
 # example data
 #mu = 100  # mean of distribution
 #sigma = 15  # standard deviation of distribution
-x = stayTime
-y = inTime
-z = outTime
+x = stayTime#[:500]
+y = inTime#[:500]
+z = outTime#[:1000]
 
 num_bins = 60
 
@@ -87,9 +87,9 @@ n, bins, patches = ax.hist(z, num_bins)
 # add a 'best fit' line
 plt.xlim(0,60)
 
-ax.set_xlabel('Time (mins)')
-ax.set_ylabel('Number of attendances')
-ax.set_title(r'Time between entrance and exit')
+#ax.set_xlabel('Time (mins)')
+#ax.set_ylabel('Number of attendances')
+#ax.set_title(r'Time between entrance and exit')
 
 # Tweak spacing to prevent clipping of ylabel
 fig.tight_layout()

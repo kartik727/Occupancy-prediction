@@ -3,22 +3,28 @@ import numpy as np
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics import r2_score
 
 import sys
-sys.path.insert(0, 'C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Model/custom_functions')
+sys.path.insert(0, 'C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Occupancy-prediction/custom_functions')
 from read_data import headerData, readAttendance
 
-X_train = pd.read_csv('C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Model/data/sample/sample1.csv', header = None)
+distanceMetrics = ['euclidean', 'manhattan', 'minkowski', 'hamming']
+
+X_train = pd.read_csv('C:/Users/Kartik Choudhary/OneDrive/Documents/Study Notes/Sem 7/ELD411 - B. Tech Project/Occupancy-prediction/data/cvl100.csv', header = None)
 
 att = X_train.values[1:, 2:-1]
 att_flat = att.flatten()
 
-classStart  = [11, 0]   # Time in hh:mm when class starts
-classEnd = [12, 0]      # Time in hh:mm when class ends
-minAttendance = 10      # Minimun number of students to acknowledge that day's class
-windowSize = 3          # Size of sliding window
-K = 3                   # K (no of nearest neighbours) in KNN
-ClassTime = 60          # Will be automated in future version
+classStart  = [8, 0]                        # Time in hh:mm when class starts
+classEnd = [9, 0]                           # Time in hh:mm when class ends
+minAttendance = 10                          # Minimun number of students to acknowledge that day's class
+windowSize = 3                              # Size of sliding window
+K = 8                                       # K (no of nearest neighbours) in KNN
+DistanceMetric = distanceMetrics[0]         # Distnace metric used in KNN
+ClassTime = 60                              # Will be automated in future version
+
+testIdx = 7
 
 added = 0
 notAdded = 0
@@ -76,28 +82,31 @@ plt.ylabel('fucking shit')
 plt.show()
 '''
 
+
 TrainSW2 = TrainSWVector[:][:(windowSize-1)*(ClassTime+1)]
 
-knn = NearestNeighbors(n_neighbors=K+1)
+knn = NearestNeighbors(n_neighbors=K+1, metric=DistanceMetric)
 knn.fit(TrainSW2)
-nbrs = knn.kneighbors([TrainSW2[-1]], return_distance=False)
+nbrs = knn.kneighbors([TrainSW2[testIdx]], return_distance=False)
 nbrs1d = np.asarray(nbrs).ravel()
 
-print(nbrs1d)
+print('Closest nieghbours to ', nbrs1d[0], ' are: ', nbrs1d[1:])
 
 predicted = np.asarray([0] * (ClassTime+1))
 for i in range(K):
     predicted += TrainSWVector[nbrs1d[i]][(windowSize-1)*(ClassTime+1):]
 predicted = predicted/K
-actual = TrainSWVector[-1][(windowSize-1)*(ClassTime+1):]
+actual = TrainSWVector[testIdx][(windowSize-1)*(ClassTime+1):]
 
-print(len(predicted), len(actual))
+#print(len(predicted), len(actual))
 
 mse = (np.square(actual - predicted)).mean(axis=None)
-print(mse)
+r2s = r2_score(actual, predicted)
+print('MSE for this prediction:', mse)
+print('R2 score:', r2s*100, '%')
 
 plt.subplot(1,3,1)
-plt.plot( range(windowSize*(ClassTime+1)), TrainSW2[-1], '.-', range((windowSize-1)*(ClassTime+1), windowSize*(ClassTime+1)), predicted, '.-')
+plt.plot( range(windowSize*(ClassTime+1)), TrainSW2[testIdx], '.-', range((windowSize-1)*(ClassTime+1), windowSize*(ClassTime+1)), predicted, '.-')
 plt.title('Test Vector')
 plt.ylabel('No. of people in class')
 
