@@ -84,12 +84,12 @@ fig, ax = plt.subplots()
 # the histogram of the data
 n, bins, patches = ax.hist(z, num_bins)
 
-# add a 'best fit' line
+# add a 'best fit' liny
 plt.xlim(0,60)
 
-#ax.set_xlabel('Time (mins)')
-#ax.set_ylabel('Number of attendances')
-#ax.set_title(r'Time between entrance and exit')
+ax.set_xlabel('Time (mins)')
+ax.set_ylabel('Number of attendances')
+ax.set_title(r'Time of exit')
 
 # Tweak spacing to prevent clipping of ylabel
 fig.tight_layout()
